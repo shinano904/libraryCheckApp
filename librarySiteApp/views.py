@@ -6,4 +6,11 @@ from django.shortcuts import render
 
 # View関数を任意に定義
 def index(request):
-    return render(request, 'librarySiteApp/index.html')
+
+    context={'result_sample1':"sample", 'result_sample2':"sample2"}
+
+    # ほしいものリストを取得
+    
+
+
+    return render(request, 'librarySiteApp/index.html', context=context)
