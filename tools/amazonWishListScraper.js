@@ -30,7 +30,7 @@ async function getProductInfo(wishListId) {
   
   async function initPage(browser) {
     const page = await browser.newPage();
-    await page.emulate(iPhone);
+    // await page.emulate(iPhone);
     // for logging
     page.on('console', msg => {
       for (let i = 0; i < msg._args.length; ++i)
@@ -40,43 +40,45 @@ async function getProductInfo(wishListId) {
   }
   
   async function scrapePage(page) {
-    return await page.evaluate(async () => {
-      // scroll down until end of the list
-      const distance = 500;
-      const delay = 100;
-      while (!document.querySelector('#no-items-section-anywhere')) {
-        // console.log('scroll down');
-        document.scrollingElement.scrollBy(0, distance);
-        await new Promise(resolve => {
-          setTimeout(resolve, delay);
-        });
-      }
+    const elems = await page.$("#itemName_I2IIPP2D1S4VO1"); // page.$$()の返り値は配列
+    console.log(elems);
+    // return await page.evaluate(async () => {
+    //   // scroll down until end of the list
+    //   const distance = 500;
+    //   const delay = 100;
+    //   while (!document.querySelector('#endOfListMarker')) {
+    //     // console.log('scroll down');
+    //     document.scrollingElement.scrollBy(0, distance);
+    //     await new Promise(resolve => {
+    //       setTimeout(resolve, delay);
+    //     });
+    //   }
   
-      // then scrape all whish items
-      const itemList = [];
-      [...document.querySelectorAll('a[href^="/dp/"].a-touch-link')].forEach(
-        el => {
-          const productID = el
-            .getAttribute('href')
-            .split('/?coliid')[0]
-            .replace('/dp/', '');
-          const title = el.querySelector('[id^="item_title_"]').textContent;
-          let price = -1;
-          const priceEle = el.querySelector('[id^="itemPrice_"] > span');
-          if (priceEle && priceEle.textContent) {
-            price = Number(
-              priceEle.textContent.replace('￥', '').replace(',', '')
-            );
-          }
-          itemList.push({
-            price: price,
-            title: title,
-            productID: productID
-          });
-        }
-      );
-      return itemList;
-    });
+    //   // then scrape all whish items
+    //   const itemList = [];
+    //   [...document.querySelectorAll('a[href^="/dp/"].a-touch-link')].forEach(
+    //     el => {
+    //       const productID = el
+    //         .getAttribute('href')
+    //         .split('/?coliid')[0]
+    //         .replace('/dp/', '');
+    //       const title = el.querySelector('[id^="item_title_"]').textContent;
+    //       let price = -1;
+    //       const priceEle = el.querySelector('[id^="itemPrice_"] > span');
+    //       if (priceEle && priceEle.textContent) {
+    //         price = Number(
+    //           priceEle.textContent.replace('￥', '').replace(',', '')
+    //         );
+    //       }
+    //       itemList.push({
+    //         price: price,
+    //         title: title,
+    //         productID: productID
+    //       });
+    //     }
+    //   );
+    //   return itemList;
+    // });
   }
   
   exports.getProductInfo = getProductInfo;
