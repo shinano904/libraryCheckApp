@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>図書館チェック</title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <!-- UIkit CSS -->
+    <link rel='stylesheet' href='/uikit-3.15.19/css/uikit.min.css' />
+     <!-- UIkit JS -->
+    <script src='/uikit-3.15.19/js/uikit.min.js'></script>
+    <script src='/uikit-3.15.19/js/uikit-icons.min.js'></script>
+  </head>
+  <body>
+    <nav class="uk-navbar-container uk-padding-small" uk-navbar>
+        <div class="uk-navbar-left">
+            <ul class="uk-navbar-nav uk-margin-medium-left">
+                <li>
+                  図書館チェック
+                </li>
+            </ul>
+        </div>
+        <div class="uk-navbar-right">
+            <label class="uk-form-label" for="form-horizontal-select">図書館選択</label>
+            <div class="uk-form-controls uk-margin-medium-right">
+                <select class="uk-select uk-form-width-medium" id="form-horizontal-select">
+                    <option>XX市</option>
+                </select>
+            </div>
+        </div>
+    </nav>
+
+    <div class="uk-container uk-container-small uk-margin-top">
+        <table class="uk-table uk-table-divider">
+            <colgroup>
+                <col width="15%">
+                <col width="40%">
+                <col width="30%">
+                <col width="15%">
+            </colgroup>
+            <tbody>
+              <% for (let item of items) { %>
+                  <tr class="">
+                    <td class="">
+                        <!-- 画像 -->
+                        <a href="<%- item.amazonUrl %>" target="_blank"><img src="<%- item.imageUrl %>" alt="<%- item.productName %>" align="top" ></a>
+                    </td>
+                    <td class="">
+                        <ul class="uk-list">
+                            <li><%- item.productName %></li>
+                            <li><%- item.authorName %></li>
+                            <li><%- item.productPrice %> (Amazon)</li>
+                        </ul>
+                    </td>
+                    <td class="">
+                        <span class="uk-label">貸出可</span>
+                    </td>
+                    <td class="">
+                        <ul class="uk-list">
+                            <li><a href="<%- item.amazonUrl %>" target="_blank">kindle</a></li>
+                            <li><a href="<%- item.amazonUrl %>" target="_blank">honto</a></li>
+                            <li><a href="<%- item.amazonUrl %>" target="_blank">dmm</a></li>
+                        </ul>
+                    </td>
+                </tr>
+              <% } %>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
