@@ -1,0 +1,12 @@
+{
+    "development": {
+        "server": "http://localhost/",
+        "wishlistid": "",
+        "calilappkey": ""
+    },
+    "production": {
+        "server": "http://example.com/",
+        "wishlistid": "",
+        "calilappkey": ""
+    }
+}

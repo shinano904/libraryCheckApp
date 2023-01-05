@@ -2,12 +2,12 @@
 <html>
   <head>
     <title>図書館チェック</title>
-    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <link rel='stylesheet' href='/css/style.css' />
     <!-- UIkit CSS -->
-    <link rel='stylesheet' href='/uikit-3.15.19/css/uikit.min.css' />
+    <link rel='stylesheet' href='/libs/uikit-3.15.19/css/uikit.min.css' />
      <!-- UIkit JS -->
-    <script src='/uikit-3.15.19/js/uikit.min.js'></script>
-    <script src='/uikit-3.15.19/js/uikit-icons.min.js'></script>
+    <script src='/libs/uikit-3.15.19/js/uikit.min.js'></script>
+    <script src='/libs/uikit-3.15.19/js/uikit-icons.min.js'></script>
   </head>
   <body>
     <nav class="uk-navbar-container uk-padding-small" uk-navbar>
@@ -19,11 +19,12 @@
             </ul>
         </div>
         <div class="uk-navbar-right">
-            <label class="uk-form-label" for="form-horizontal-select">図書館選択</label>
+            <!-- <label class="uk-form-label" for="form-horizontal-select">図書館選択</label> -->
             <div class="uk-form-controls uk-margin-medium-right">
-                <select class="uk-select uk-form-width-medium" id="form-horizontal-select">
+                <!-- <select class="uk-select uk-form-width-medium" id="form-horizontal-select">
                     <option>XX市</option>
-                </select>
+                </select> -->
+                <button class="uk-button uk-button-primary" id="upload">更新</button>
             </div>
         </div>
     </nav>
