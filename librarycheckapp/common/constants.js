@@ -1,4 +1,3 @@
-const WISH_LIST_ID = '';
 const URL_BASE = 'https://www.amazon.co.jp/hz/wishlist/ls/';
 const IMAGE_URL = (asin) =>`https://images-fe.ssl-images-amazon.com/images/P/${asin}.09.TZZZZZZZ`;
 const AMAZON_PRODUCT_URL = (asin) =>`https://www.amazon.co.jp/dp/${asin}/`;
@@ -16,7 +15,6 @@ const ASIN = {
 }
 
 module.exports = {
-    WISH_LIST_ID,
     URL_BASE,
     IMAGE_URL,
     AMAZON_PRODUCT_URL,
