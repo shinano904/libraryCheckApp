@@ -2,6 +2,7 @@ var express = require('express');
 const request = require('request');
 const wishScraper = require('../models/wishListScraper');
 const { CALIL_API_URL } = require('../common/constants');
+const e = require('express');
 var app = express();
 var config = require('../config.json')[app.get('env')];
 
@@ -13,13 +14,15 @@ router.get('/', function(req, res, next) {
     // amazonの欲しいものリストを取得
     const itemList = await wishScraper.getItemList(config.wishlistid);
     
+    // ISBN取得
+    
     // 蔵書状況を取得
-    const libraryInfo = getLibraryInfo(itemList);
+    const libraryInfo = await getLibraryInfo(itemList);
+    console.log("libraryInfo: " + JSON.stringify(libraryInfo));
 
     var data = {
-      items: itemList
+      items: libraryInfo
     };
-  
     // 画面表示用の連想配列作成
 
 
@@ -42,7 +45,6 @@ async function getLibraryInfo(itemList) {
   console.log(isbn);
 
   let qStr = {
-    // TODO:: configにする
       appkey : config.calilappkey,
       isbn : isbn,
       systemid : 'Aichi_Kariya',
@@ -52,6 +54,7 @@ async function getLibraryInfo(itemList) {
 
   let timeout = ms => new Promise(done => setTimeout( done, ms ));
   let countinue = true;
+  let items = {};
   while ( countinue ) {
     request.get({
       uri: CALIL_API_URL,
@@ -59,39 +62,29 @@ async function getLibraryInfo(itemList) {
       qs: qStr,
       json: true
     }, function(err, req, data){
-        // json変換
-        // console.log(data);
         console.log('json.continue: %s', data.continue);
         if (data.continue == 0) {
           // 蔵書情報取得
           const books = data.books;
           console.log(books);
-
-          books.forEach((book, index) => {
-            console.log('book.Aichi_Kariya.status: %s',book.Aichi_Kariya.status);
-          });
-          //   const item = itemList.find(element => element['productAsin'] == book.key);
-            
-          //   console.log(item.itemId);
-          //   console.log(item.productName);
-          //   console.log(item.book.Aichi_Kariya.reserveurl);
-            
-          //   return {
-          //     itemId : item.itemId, 
-          //     productPrice : item.productPrice, 
-          //     productName : item.productName, 
-          //     productAsin : item.productAsin,
-          //     authorName : item.authorName,
-          //     imageUrl : item.imageUrl,
-          //     amazonUrl : item.amazonUrl,
-          //     reserveurl : book.Aichi_Kariya.reserveurl,
-          //     libkey : book.Aichi_Kariya.libkey
-          //   }
-          // }).get();
           
-          // return result;
-
+          items = Object.keys(books).map(function (isbn) {           
+            const item = itemList.find(element => element['productAsin'] == isbn);
+            return {
+              itemId : item.itemId, 
+              productPrice : item.productPrice, 
+              productName : item.productName, 
+              productAsin : item.productAsin,
+              authorName : item.authorName,
+              imageUrl : item.imageUrl,
+              amazonUrl : item.amazonUrl,
+              reserveurl : books[isbn].Aichi_Kariya.reserveurl,
+              libkey : books[isbn].Aichi_Kariya.libkey
+            }
+          });
+          
           countinue = false;
+          // console.log("libraryInfo: " + JSON.stringify(items));
           
         } else {
           // 再度API送信
@@ -104,11 +97,10 @@ async function getLibraryInfo(itemList) {
           };
         }
     });
-
     await timeout( 5000 );
   }
 
-  return;
+  return items;
 }
 
 module.exports = router;

@@ -34,7 +34,8 @@
             <colgroup>
                 <col width="15%">
                 <col width="40%">
-                <col width="30%">
+                <col width="15%">
+                <col width="15%">
                 <col width="15%">
             </colgroup>
             <tbody>
@@ -52,7 +53,19 @@
                         </ul>
                     </td>
                     <td class="">
-                        <span class="uk-label">貸出可</span>
+                        <% if (Object.keys(item.libkey).length > 0) { %>
+                            <% Object.keys(item.libkey).forEach(function (key) { %>
+                            <span class="uk-label"><%- key %> : <%- item.libkey[key] %></span>
+                            <% }) %>
+                        <% } else { %>
+                            <span class="uk-label">蔵書なし</span>
+                        <% } %>
+                    </td>
+                    <td class="">
+                        <!-- 予約リンク -->
+                        <% if (item.reserveurl != "") { %>
+                            <a href="<%- item.reserveurl %>" target="_blank">予約</a>
+                        <% } %>
                     </td>
                     <td class="">
                         <ul class="uk-list">
