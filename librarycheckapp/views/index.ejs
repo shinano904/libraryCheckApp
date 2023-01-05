@@ -10,69 +10,65 @@
     <script src='/libs/uikit-3.15.19/js/uikit-icons.min.js'></script>
   </head>
   <body>
-    <nav class="uk-navbar-container uk-padding-small" uk-navbar>
-        <div class="uk-navbar-left">
-            <ul class="uk-navbar-nav uk-margin-medium-left">
-                <li>
-                  図書館チェック
-                </li>
-            </ul>
-        </div>
-        <div class="uk-navbar-right">
-            <!-- <label class="uk-form-label" for="form-horizontal-select">図書館選択</label> -->
-            <div class="uk-form-controls uk-margin-medium-right">
-                <!-- <select class="uk-select uk-form-width-medium" id="form-horizontal-select">
-                    <option>XX市</option>
-                </select> -->
-                <button class="uk-button uk-button-primary" id="upload">更新</button>
+    <div uk-sticky="sel-target: .uk-navbar-container; cls-active: uk-navbar-sticky">
+        <nav class="uk-navbar-container uk-padding-small" uk-navbar>
+            <div class="uk-navbar-left">
+                <ul class="uk-navbar-nav uk-margin-medium-left">
+                    <li>
+                    図書館チェック
+                    </li>
+                </ul>
             </div>
-        </div>
-    </nav>
-
+            <div class="uk-navbar-right">
+                <!-- <label class="uk-form-label" for="form-horizontal-select">図書館選択</label> -->
+                <div class="uk-form-controls uk-margin-medium-right">
+                    <!-- <select class="uk-select uk-form-width-medium" id="form-horizontal-select">
+                        <option>XX市</option>
+                    </select> -->
+                    <button class="uk-button uk-button-primary" id="upload">更新</button>
+                </div>
+            </div>
+        </nav>
+    </div>
     <div class="uk-container uk-container-small uk-margin-top">
         <table class="uk-table uk-table-divider">
             <colgroup>
                 <col width="15%">
-                <col width="40%">
-                <col width="15%">
-                <col width="15%">
+                <col width="50%">
+                <col width="20%">
                 <col width="15%">
             </colgroup>
             <tbody>
               <% for (let item of items) { %>
                   <tr class="">
-                    <td class="">
-                        <!-- 画像 -->
+                    <td class="uk-text-center">
                         <a href="<%- item.amazonUrl %>" target="_blank"><img src="<%- item.imageUrl %>" alt="<%- item.productName %>" align="top" ></a>
                     </td>
                     <td class="">
                         <ul class="uk-list">
                             <li><%- item.productName %></li>
-                            <li><%- item.authorName %></li>
-                            <li><%- item.productPrice %> (Amazon)</li>
+                            <li class="uk-text-small"><%- item.authorName %></li>
+                            <li class="uk-text-small"><%- item.productPrice %> (Amazon)</li>
                         </ul>
                     </td>
-                    <td class="">
+                    <td class="uk-text-middle">
                         <% if (Object.keys(item.libkey).length > 0) { %>
                             <% Object.keys(item.libkey).forEach(function (key) { %>
-                            <span class="uk-label"><%- key %> : <%- item.libkey[key] %></span>
+                            <a href="https://calil.jp/book/<%- item.productAsin %>"  target="_blank">
+                                <span class="uk-label uk-label-warning"><%- key %> : <%- item.libkey[key] %></span>
+                            </a>
                             <% }) %>
                         <% } else { %>
-                            <span class="uk-label">蔵書なし</span>
+                            <a href="https://calil.jp/book/<%- item.productAsin %>"  target="_blank">
+                                <span class="uk-label">蔵書なし</span>
+                            </a>
                         <% } %>
                     </td>
-                    <td class="">
+                    <td class="uk-text-center uk-text-middle">
                         <!-- 予約リンク -->
                         <% if (item.reserveurl != "") { %>
-                            <a href="<%- item.reserveurl %>" target="_blank">予約</a>
+                            <a href="<%- item.reserveurl %>" target="_blank" class="uk-button uk-button-default uk-button-small">予約</a>
                         <% } %>
-                    </td>
-                    <td class="">
-                        <ul class="uk-list">
-                            <li><a href="<%- item.amazonUrl %>" target="_blank">kindle</a></li>
-                            <li><a href="<%- item.amazonUrl %>" target="_blank">honto</a></li>
-                            <li><a href="<%- item.amazonUrl %>" target="_blank">dmm</a></li>
-                        </ul>
                     </td>
                 </tr>
               <% } %>
