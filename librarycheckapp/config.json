@@ -2,11 +2,13 @@
     "development": {
         "server": "http://localhost/",
         "wishlistid": "",
-        "calilappkey": ""
+        "calilappkey": "",
+        "calilsystemid": ""
     },
     "production": {
         "server": "http://example.com/",
         "wishlistid": "",
-        "calilappkey": ""
+        "calilappkey": "",
+        "calilsystemid": ""
     }
 }
