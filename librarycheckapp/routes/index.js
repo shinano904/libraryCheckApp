@@ -1,8 +1,7 @@
 var express = require('express');
-const request = require('request');
+const axios = require('axios');
 const wishScraper = require('../models/wishListScraper');
-const { CALIL_API_URL } = require('../common/constants');
-const e = require('express');
+const { CALIL_API_URL, GOOGLE_API_URL } = require('../common/constants');
 var app = express();
 var config = require('../config.json')[app.get('env')];
 
@@ -14,32 +13,104 @@ router.get('/', function(req, res, next) {
     // amazonの欲しいものリストを取得
     const itemList = await wishScraper.getItemList(config.wishlistid);
     
-    // ISBN取得
-    
-    // 蔵書状況を取得
-    const libraryInfo = await getLibraryInfo(itemList);
-    console.log("libraryInfo: " + JSON.stringify(libraryInfo));
+    const isbnInfo = await getIsbnInfo(itemList);
+    // console.log("isbnInfo: " + JSON.stringify(isbnInfo));
 
+    // 蔵書状況を取得
+    const libraryInfo = await getLibraryInfo(isbnInfo);
+    // console.log("libraryInfo: " + JSON.stringify(libraryInfo));
+    
     var data = {
       items: libraryInfo
     };
-    // 画面表示用の連想配列作成
-
-
 
     res.render('index', data);
   })().catch(next);
-  
-  
 });
+
+/**
+ * ISBNを取得(Kindle版のみ)
+ */
+async function getIsbnInfo(itemList) {
+  console.log("getIsbnInfo");
+  let axioss = new Array();
+  var asinArr = new Object();
+  let count = 0;
+  let resultArr = new Array();
+
+  itemList.forEach((item,index) => {
+    if (item.authorName.indexOf('(Kindle版)') != -1) {
+      const title = item.productName.indexOf(' ') != -1 ? item.productName.substr(0, item.productName.indexOf(' ')) : item.productName;
+      const author = item.authorName.indexOf(',') != -1 ? item.authorName.substr(0, item.authorName.indexOf(',')) : item.authorName;
+
+      axioss[count] = axios.get(GOOGLE_API_URL, {params:{
+        q : 'intitle:' + title + '+inauthor:' + author.replace('(Kindle版)', '').trim()
+      }});
+
+      asinArr[count] = item.productAsin;
+      count++;
+    } else {
+      resultArr.push(
+        {
+          itemId : item.itemId, 
+          productPrice : item.productPrice, 
+          productName : item.productName, 
+          productAsin : item.productAsin,
+          authorName : item.authorName,
+          imageUrl : item.imageUrl,
+          amazonUrl : item.amazonUrl,
+          productIsbnFlg : 'OK'
+        }
+      );
+    }
+  });
+
+  console.log("count %s" ,axioss.length);
+  const results = await Promise.all(axioss);
+  
+  results.forEach((response, index) => {
+    
+    let asin = asinArr[index];
+    let isbnFlg = 'NG';
+    const item = itemList.find(element => element['productAsin'] == asin);
+
+    if (Number(response.data.totalItems) >= 1) {
+      for(let element of response.data.items[0].volumeInfo.industryIdentifiers){
+        if (element.type == 'ISBN_10') {
+          asin = element.identifier;
+          isbnFlg = 'OK'
+          break;
+        }
+      }
+    }
+    
+    resultArr.push(
+      {
+        itemId : item.itemId, 
+        productPrice : item.productPrice, 
+        productName : item.productName, 
+        productAsin : asin,
+        authorName : item.authorName,
+        imageUrl : item.imageUrl,
+        amazonUrl : item.amazonUrl,
+        productIsbnFlg : isbnFlg
+      }
+    );
+  });
+
+  console.log("resultArr: %s", JSON.stringify(resultArr,null,'\t'));
+  return resultArr;
+}
+
 
 /**
  * 蔵書状況を取得
  */
 async function getLibraryInfo(itemList) {
+  console.log("getLibraryInfo");
   // ISBNをカンマ区切り
   const productAsinArray = itemList.map((row) => {
-    return [row['productAsin']]
+      return [row['productAsin']];
   });
   const isbn = productAsinArray.join(',');
   console.log(isbn);
@@ -47,60 +118,65 @@ async function getLibraryInfo(itemList) {
   let qStr = {
       appkey : config.calilappkey,
       isbn : isbn,
+      // TODO::configに移す
       systemid : 'Aichi_Kariya',
       format : 'json',
       callback : 'no'
   };
-
+  
   let timeout = ms => new Promise(done => setTimeout( done, ms ));
   let countinue = true;
   let items = {};
   while ( countinue ) {
-    request.get({
-      uri: CALIL_API_URL,
-      headers: {'Content-type': 'application/json'},
-      qs: qStr,
-      json: true
-    }, function(err, req, data){
-        console.log('json.continue: %s', data.continue);
-        if (data.continue == 0) {
-          // 蔵書情報取得
-          const books = data.books;
-          console.log(books);
-          
-          items = Object.keys(books).map(function (isbn) {           
-            const item = itemList.find(element => element['productAsin'] == isbn);
-            return {
-              itemId : item.itemId, 
-              productPrice : item.productPrice, 
-              productName : item.productName, 
-              productAsin : item.productAsin,
-              authorName : item.authorName,
-              imageUrl : item.imageUrl,
-              amazonUrl : item.amazonUrl,
-              reserveurl : books[isbn].Aichi_Kariya.reserveurl,
-              libkey : books[isbn].Aichi_Kariya.libkey
+    (async () => { 
+          await axios.get(CALIL_API_URL, {
+              params:qStr
+          })
+          .then(function (response) {
+            // handle success
+            console.log('json.continue: %s', response.data.continue);
+            if (response.data.continue == 0) {
+              // 蔵書情報取得
+              const books = response.data.books;
+    
+              items = Object.keys(books).map(function (isbn) {           
+                const item = itemList.find(element => element['productAsin'] == isbn);
+                return {
+                  itemId : item.itemId, 
+                  productPrice : item.productPrice, 
+                  productName : item.productName, 
+                  productAsin : item.productAsin,
+                  authorName : item.authorName,
+                  imageUrl : item.imageUrl,
+                  amazonUrl : item.amazonUrl,
+                  productIsbnFlg : item.productIsbnFlg,
+                  reserveurl : books[isbn].Aichi_Kariya.reserveurl,
+                  libkey : books[isbn].Aichi_Kariya.libkey
+                }
+              });
+              
+              countinue = false;
+              
+            } else {
+              // 再度API送信
+              qStr = {
+                appkey : config.calilappkey,
+                session : response.data.session,
+                format : 'json',
+                callback : 'no'
+              };
             }
+          })
+          .catch(function (error) {
+            // handle error
+            console.log(error);
+          })
+          .finally(function () {
+            // always executed
           });
-          
-          countinue = false;
-          // console.log("libraryInfo: " + JSON.stringify(items));
-          
-        } else {
-          // 再度API送信
-          qStr = {
-            // TODO:: configにする
-            appkey : config.calilappkey,
-            session : data.session,
-            format : 'json',
-            callback : 'no'
-          };
-        }
-    });
+        })();
     await timeout( 5000 );
   }
-
   return items;
 }
-
 module.exports = router;
