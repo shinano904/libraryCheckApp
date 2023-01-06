@@ -13,27 +13,22 @@ router.get('/', function(req, res, next) {
     // amazonの欲しいものリストを取得
     const itemList = await wishScraper.getItemList(config.wishlistid);
     
+    // ISBN取得
     const isbnInfo = await getIsbnInfo(itemList);
-    // console.log("isbnInfo: " + JSON.stringify(isbnInfo));
 
     // 蔵書状況を取得
     const libraryInfo = await getLibraryInfo(isbnInfo);
-    // console.log("libraryInfo: " + JSON.stringify(libraryInfo));
-    
-    var data = {
-      items: libraryInfo
-    };
 
-    res.render('index', data);
+    res.render('index', {items: libraryInfo});
   })().catch(next);
 });
 
 /**
- * ISBNを取得(Kindle版のみ)
+ * ISBNを取得
  */
 async function getIsbnInfo(itemList) {
   console.log("getIsbnInfo");
-  let axioss = new Array();
+  let axiosArr = new Array();
   var asinArr = new Object();
   let count = 0;
   let resultArr = new Array();
@@ -43,7 +38,7 @@ async function getIsbnInfo(itemList) {
       const title = item.productName.indexOf(' ') != -1 ? item.productName.substr(0, item.productName.indexOf(' ')) : item.productName;
       const author = item.authorName.indexOf(',') != -1 ? item.authorName.substr(0, item.authorName.indexOf(',')) : item.authorName;
 
-      axioss[count] = axios.get(GOOGLE_API_URL, {params:{
+      axiosArr[count] = axios.get(GOOGLE_API_URL, {params:{
         q : 'intitle:' + title + '+inauthor:' + author.replace('(Kindle版)', '').trim()
       }});
 
@@ -65,8 +60,8 @@ async function getIsbnInfo(itemList) {
     }
   });
 
-  console.log("count %s" ,axioss.length);
-  const results = await Promise.all(axioss);
+  console.log("count %s" ,axiosArr.length);
+  const results = await Promise.all(axiosArr);
   
   results.forEach((response, index) => {
     
@@ -118,8 +113,7 @@ async function getLibraryInfo(itemList) {
   let qStr = {
       appkey : config.calilappkey,
       isbn : isbn,
-      // TODO::configに移す
-      systemid : 'Aichi_Kariya',
+      systemid : config.calilsystemid,
       format : 'json',
       callback : 'no'
   };
@@ -179,4 +173,6 @@ async function getLibraryInfo(itemList) {
   }
   return items;
 }
+
+
 module.exports = router;
