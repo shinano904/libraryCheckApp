@@ -58,9 +58,13 @@
                                 <span class="uk-label uk-label-warning"><%- key %> : <%- item.libkey[key] %></span>
                             </a>
                             <% }) %>
-                        <% } else { %>
+                        <% } else if (item.productIsbnFlg == 'OK') { %>
                             <a href="https://calil.jp/book/<%- item.productAsin %>"  target="_blank">
                                 <span class="uk-label">蔵書なし</span>
+                            </a>
+                        <% } else { %>
+                            <a href="https://calil.jp/book/<%- item.productAsin %>"  target="_blank">
+                                <span class="uk-label uk-label-danger">取得失敗</span>
                             </a>
                         <% } %>
                     </td>
