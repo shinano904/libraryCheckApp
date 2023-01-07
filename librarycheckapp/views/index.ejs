@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>図書館チェック</title>
+    <title><%= title %></title>
     <link rel='stylesheet' href='/css/style.css' />
     <!-- UIkit CSS -->
     <link rel='stylesheet' href='/libs/uikit-3.15.19/css/uikit.min.css' />
@@ -15,11 +15,12 @@
             <div class="uk-navbar-left">
                 <ul class="uk-navbar-nav uk-margin-medium-left">
                     <li>
-                    図書館チェック
+                        <%= title %>
                     </li>
                 </ul>
             </div>
             <div class="uk-navbar-right">
+                <!-- 今後複数の図書館も選択できるようにしたい -->
                 <!-- <label class="uk-form-label" for="form-horizontal-select">図書館選択</label> -->
                 <div class="uk-form-controls uk-margin-medium-right">
                     <!-- <select class="uk-select uk-form-width-medium" id="form-horizontal-select">
@@ -58,7 +59,7 @@
                                 <span class="uk-label uk-label-warning"><%- key %> : <%- item.libkey[key] %></span>
                             </a>
                             <% }) %>
-                        <% } else if (item.productIsbnFlg == 'OK') { %>
+                        <% } else if (item.productIsbnFlg == productIsbnFlg.ok) { %>
                             <a href="https://calil.jp/book/<%- item.productAsin %>"  target="_blank">
                                 <span class="uk-label">蔵書なし</span>
                             </a>
@@ -69,7 +70,6 @@
                         <% } %>
                     </td>
                     <td class="uk-text-center uk-text-middle">
-                        <!-- 予約リンク -->
                         <% if (item.reserveurl != "") { %>
                             <a href="<%- item.reserveurl %>" target="_blank" class="uk-button uk-button-default uk-button-small">予約</a>
                         <% } %>
