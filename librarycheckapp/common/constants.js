@@ -13,7 +13,12 @@ const SELECTORS = {
 const ASIN = {
     start : 5,
     end : 15
-}
+};
+
+const PRODUCT_ISBN_FLG = {
+    ok : 'OK',
+    ng : 'NG'
+};
 
 module.exports = {
     URL_BASE,
@@ -22,5 +27,6 @@ module.exports = {
     CALIL_API_URL,
     GOOGLE_API_URL,
     SELECTORS,
-    ASIN
+    ASIN,
+    PRODUCT_ISBN_FLG
 };
