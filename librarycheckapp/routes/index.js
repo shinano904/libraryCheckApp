@@ -130,9 +130,7 @@ async function getLibraryInfo(itemList) {
             // handle success
             console.log('json.continue: %s', response.data.continue);
             if (response.data.continue == 0) {
-              // 蔵書情報取得
               const books = response.data.books;
-    
               items = Object.keys(books).map(function (isbn) {           
                 const item = itemList.find(element => element['productAsin'] == isbn);
                 return {
@@ -173,6 +171,5 @@ async function getLibraryInfo(itemList) {
   }
   return items;
 }
-
 
 module.exports = router;
