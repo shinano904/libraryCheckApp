@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/css/style.css' />
+    <!-- UIkit CSS -->
+    <link rel='stylesheet' href='/libs/uikit-3.15.19/css/uikit.min.css' />
+     <!-- UIkit JS -->
+    <script src='/libs/uikit-3.15.19/js/uikit.min.js'></script>
+    <script src='/libs/uikit-3.15.19/js/uikit-icons.min.js'></script>
+  </head>
+  <body>
+    <div uk-sticky="sel-target: .uk-navbar-container; cls-active: uk-navbar-sticky">
+        <nav class="uk-navbar-container uk-padding-small" uk-navbar>
+            <div class="uk-navbar-left">
+                <ul class="uk-navbar-nav uk-margin-medium-left">
+                    <li>
+                        <%= title %>
+                    </li>
+                </ul>
+            </div>
+            <div class="uk-navbar-right">
+                <!-- 今後複数の図書館も選択できるようにしたい -->
+                <!-- <label class="uk-form-label" for="form-horizontal-select">図書館選択</label> -->
+                <div class="uk-form-controls uk-margin-medium-right">
+                    <!-- <select class="uk-select uk-form-width-medium" id="form-horizontal-select">
+                        <option>XX市</option>
+                    </select> -->
+                    <!-- <button class="uk-button uk-button-primary" id="upload">更新</button> -->
+                </div>
+            </div>
+        </nav>
+    </div>
+    <div class="uk-container uk-container-small uk-margin-top">
+        <table class="uk-table uk-table-divider">
+            <colgroup>
+                <col width="15%">
+                <col width="50%">
+                <col width="20%">
+                <col width="15%">
+            </colgroup>
+            <tbody>
+              <% for (let item of items) { %>
+                  <tr class="">
+                    <td class="uk-text-center">
+                        <a href="<%- item.amazonUrl %>" target="_blank"><img src="<%- item.imageUrl %>" alt="<%- item.productName %>" align="top" ></a>
+                    </td>
+                    <td class="">
+                        <ul class="uk-list">
+                            <li><%- item.productName %></li>
+                            <li class="uk-text-small"><%- item.authorName %></li>
+                            <li class="uk-text-small"><%- item.productPrice %> (Amazon)</li>
+                        </ul>
+                    </td>
+                    <td class="uk-text-middle">
+                        <% if (Object.keys(item.libkey).length > 0) { %>
+                            <% Object.keys(item.libkey).forEach(function (key) { %>
+                            <a href="https://calil.jp/book/<%- item.productAsin %>"  target="_blank">
+                                <span class="uk-label uk-label-warning"><%- key %> : <%- item.libkey[key] %></span>
+                            </a>
+                            <% }) %>
+                        <% } else if (item.productIsbnFlg == productIsbnFlg.ok) { %>
+                            <a href="https://calil.jp/book/<%- item.productAsin %>"  target="_blank">
+                                <span class="uk-label">蔵書なし</span>
+                            </a>
+                        <% } else { %>
+                            <a href="https://calil.jp/book/<%- item.productAsin %>"  target="_blank">
+                                <span class="uk-label uk-label-danger">取得失敗</span>
+                            </a>
+                        <% } %>
+                    </td>
+                    <td class="uk-text-center uk-text-middle">
+                        <% if (item.reserveurl != "") { %>
+                            <a href="<%- item.reserveurl %>" target="_blank" class="uk-button uk-button-default uk-button-small">予約</a>
+                        <% } %>
+                    </td>
+                </tr>
+              <% } %>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
